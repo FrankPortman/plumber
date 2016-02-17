@@ -107,6 +107,7 @@ parseQS2 <- function(qs){
     qs <- substr(qs, 2, nchar(qs))
   }
 
+  qs <- unlist(strsplit(qs, "\n"))
   qs <- gsub("+", " ", qs, fixed=TRUE)
 
   parts <- unlist(strsplit(qs, "&", fixed=TRUE))
