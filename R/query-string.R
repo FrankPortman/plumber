@@ -1,6 +1,6 @@
 queryStringFilter <- function(req){
   qs <- req$QUERY_STRING
-  args <- parseQS(qs)
+  args <- parseQS2(qs)
   req$args <- c(req$args, args)
   forward()
 }
@@ -97,4 +97,34 @@ extractPathParams <- function(def, path){
   }
 
   vals
+}
+
+parseQS2 <- function(qs){
+  if (is.null(qs) || length(qs) == 0 || qs == ""){
+    return(list())
+  }
+  if (stri_startswith_fixed(qs, "?")){
+    qs <- substr(qs, 2, nchar(qs))
+  }
+
+  qs <- gsub("+", " ", qs, fixed=TRUE)
+
+  parts <- unlist(strsplit(qs, "&", fixed=TRUE))
+  kv <- strsplit(parts, "=", fixed=TRUE)
+  kv <- kv[sapply(kv, length) == 2] # Ignore incompletes
+
+  keys <- sapply(kv, "[[", 1)
+  keys <- unname(sapply(keys, URLdecode))
+
+  vals <- sapply(kv, "[[", 2)
+  vals[is.na(vals)] <- ""
+  vals <- unname(sapply(vals, URLdecode))
+
+  df <- data.frame(key = keys, value = vals, id = rep(1:(length(vals) / length(unique(keys))), each = length(unique(keys))))
+  df <- reshape2::dcast(df, id ~ key, value.var = 'value', drop = TRUE)[, -1]
+
+  ret <- as.list(df)
+
+  ret
+
 }
