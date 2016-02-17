@@ -59,3 +59,5 @@ library(plumber)
 
 plumber was originally released as the `rapier` package and has since been renamed (7/13/2015).
 
+curl --data-binary @tmp3 "http://localhost:1234/test"
+
